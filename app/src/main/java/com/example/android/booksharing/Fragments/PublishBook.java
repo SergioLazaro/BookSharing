@@ -5,6 +5,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,10 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.android.booksharing.Activities.MainActivity;
+import com.example.android.booksharing.AsyncTask.PublishAsyncTask;
+import com.example.android.booksharing.Objects.Publication;
+import com.example.android.booksharing.Objects.SQLInjection;
 import com.example.android.booksharing.R;
 
 /**
@@ -22,8 +27,7 @@ import com.example.android.booksharing.R;
  */
 public class PublishBook extends Fragment {
 
-    private static String email;
-    private String showMessage;
+    private String username;
     private String selectedOption = "";
     private EditText title, author, description;
     private Spinner spinner;
@@ -31,10 +35,12 @@ public class PublishBook extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         //Getting arguments
         if(getArguments() != null){
-            showMessage = getArguments().getString("username");
+            username = getArguments().getString("username");
         }
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.publish_book_fragment, container, false);
     }
@@ -66,12 +72,27 @@ public class PublishBook extends Fragment {
 
         confirmPublication.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                Toast.makeText(v.getContext(),"Confirm Publication",Toast.LENGTH_SHORT).show();
+                confirm();
             }
         });
 
-        //Check SQLInjection
+    }
 
+    private void confirm(){
+        SQLInjection sql = new SQLInjection();
+        String title = this.title.getText().toString();
+        String author = this.author.getText().toString();
+        String description = this.description.getText().toString();
+        if(sql.checkSQLInjection(title) && sql.checkSQLInjection(author) &&
+                sql.checkSQLInjection(description)){
+            Log.e("USERNAME: ", username);
+            Publication p = new Publication(username,title,author,selectedOption,
+                    rating.getRating(),description);
+            new PublishAsyncTask(getContext()).execute(p.generateJSONObject());
+        }
+        else{
+            Toast.makeText(getContext(),"Invalid fields detected",Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

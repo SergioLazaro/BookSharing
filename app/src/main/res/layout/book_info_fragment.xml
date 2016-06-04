@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.21">
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="125dp"
+            android:id="@+id/imageView3"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="20dp" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:id="@+id/userView"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                style="@style/Base.TextAppearance.AppCompat.Subhead" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:id="@+id/titleView"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                style="@style/Base.TextAppearance.AppCompat.Subhead" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:id="@+id/authorView"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                style="@style/Base.TextAppearance.AppCompat.Subhead" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:id="@+id/ratingView"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                style="@style/Base.TextAppearance.AppCompat.Subhead" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Description:"
+        android:id="@+id/textView6"
+        android:layout_weight="0.04"
+        style="@style/Base.TextAppearance.AppCompat.Subhead" />
+
+    <TextView
+        android:layout_width="306dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/descriptionView"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.21"
+        style="@style/Base.TextAppearance.AppCompat.Subhead" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chat"
+        android:id="@+id/chatButton"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="20dp"
+        android:background="@color/colorPrimary"/>
+</LinearLayout>

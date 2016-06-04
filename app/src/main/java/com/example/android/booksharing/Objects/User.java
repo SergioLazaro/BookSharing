@@ -1,5 +1,8 @@
 package com.example.android.booksharing.Objects;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -35,7 +38,7 @@ public class User {
         return digest.digest(password.getBytes());
     }
     private String bin2hex(byte[] data) {
-        return String.format("%0" + (data.length*2) + "X", new BigInteger(1, data));
+        return String.format("%0" + (data.length * 2) + "X", new BigInteger(1, data));
     }
 
     public String getUsername(){
@@ -48,5 +51,17 @@ public class User {
 
     public String getHash(){
         return hash;
+    }
+
+    public String generateJSONObject(){
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("username",username);
+            obj.put("password",hash);
+            return obj.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 }

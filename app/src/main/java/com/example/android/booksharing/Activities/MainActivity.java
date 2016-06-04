@@ -1,12 +1,14 @@
 package com.example.android.booksharing.Activities;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int INTERNET_REQUEST = 0;
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,13 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        Intent intent = getIntent();
+        if( intent != null ){
+            Log.e("ASDFASDF","ASDFASDF");
+            Log.e("USERNAME:",intent.getStringExtra("username"));
+            username = intent.getStringExtra("username");
+        }
 
         //Check INTERNET permission
         checkInternetPermission();
@@ -140,7 +150,12 @@ public class MainActivity extends AppCompatActivity
             ft.commit();
         } else if (id == R.id.nav_gallery) {
             android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container, new PublishBook());
+            Fragment fragment = new PublishBook();
+            //Setting arguments
+            Bundle arguments = new Bundle();
+            arguments.putString("username", username);
+            fragment.setArguments(arguments);
+            ft.replace(R.id.fragment_container, fragment);
             ft.addToBackStack(null);
             ft.commit();
         } else if (id == R.id.nav_share) {

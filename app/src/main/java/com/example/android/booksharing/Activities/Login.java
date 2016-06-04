@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.booksharing.AsyncTask.LoginAsyncTask;
 import com.example.android.booksharing.Fragments.ListBooks;
 import com.example.android.booksharing.Objects.SQLInjection;
 import com.example.android.booksharing.Objects.User;
@@ -40,12 +41,10 @@ public class Login extends AppCompatActivity {
             if(sql.checkSQLInjection(email) && sql.checkSQLInjection(password)){    //Everything OK
                 User user = new User(email,password);
                 //Start AsyncTask
+                new LoginAsyncTask(view.getContext()).execute(user.generateJSONObject());
 
-                //Check results from AsyncTask
-                Intent intent = new Intent(view.getContext(),MainActivity.class);
-                startActivity(intent);
             }
-            else{   //SQLInjection try
+            else{   //SQLInjection attempt
                 Toast.makeText(view.getContext(),"Invalid username or password",Toast.LENGTH_SHORT).show();
             }
         }
@@ -55,16 +54,9 @@ public class Login extends AppCompatActivity {
     }
 
     public void signupRequest(View view){
-        Toast.makeText(view.getContext(),"SIGNUP",Toast.LENGTH_SHORT);
         Intent intent = new Intent(view.getContext(),Signup.class);
         startActivity(intent);
     }
 
-    public void startFragment(){
-        android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, new ListBooks());
-        ft.addToBackStack(null);
-        ft.commit();
-    }
 
 }

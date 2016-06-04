@@ -1,17 +1,17 @@
 package com.example.android.booksharing.AsyncTask;
 
 /**
- * Created by Sergio on 02/06/16.
+ * Created by Sergio on 2/6/16.
  */
+
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-
-import com.example.android.booksharing.Activities.Login;
-import com.example.android.booksharing.Fragments.ListBooks;
-import com.example.android.booksharing.R;
+import com.example.android.booksharing.Activities.MainActivity;
+import com.example.android.booksharing.Activities.Signup;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,11 +24,11 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 
 
-public class LoginAsyncTask  extends AsyncTask<String,Void,String> {
+public class SignupAsyncTask  extends AsyncTask<String,Void,String> {
     private Context context;
     private String email, password;
 
-    public LoginAsyncTask(Context context) {
+    public SignupAsyncTask(Context context) {
         this.context = context;
     }
 
@@ -43,8 +43,8 @@ public class LoginAsyncTask  extends AsyncTask<String,Void,String> {
         password = (String) arg0[1];
 
         try {
-            String link = "";
-            String data  = URLEncoder.encode("email", "UTF-8") + "=" + URLEncoder.encode(email, "UTF-8");
+            String link = "https://booksharing-sergiolazaro.rhcloud.com/signup.php";
+            String data  = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(email, "UTF-8");
             data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(password, "UTF-8");
 
             URL url = new URL(link);
@@ -76,16 +76,17 @@ public class LoginAsyncTask  extends AsyncTask<String,Void,String> {
 
     @Override
     protected void onPostExecute(String line){
-        Log.i("RESULT",line);
         try {
             JSONObject json = new JSONObject(line);
             boolean result = Boolean.parseBoolean(json.getString("result"));
-            Log.i("VALUE","" + result);
             if(!result){
-                Toast.makeText(context, "User " + email + " does not exist", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "User " + email + " cannot be created", Toast.LENGTH_SHORT).show();
             }
             else{
                 Toast.makeText(context, "Welcome " + email, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(context,MainActivity.class);
+                intent.putExtra("username",email);
+                context.startActivity(intent);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -95,3 +96,4 @@ public class LoginAsyncTask  extends AsyncTask<String,Void,String> {
 
 
 }
+
