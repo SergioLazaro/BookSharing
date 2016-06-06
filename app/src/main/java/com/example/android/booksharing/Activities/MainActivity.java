@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -50,16 +51,19 @@ public class MainActivity extends AppCompatActivity
 
         Intent intent = getIntent();
         if( intent != null ){
-            Log.e("ASDFASDF","ASDFASDF");
-            Log.e("USERNAME:",intent.getStringExtra("username"));
             username = intent.getStringExtra("username");
         }
 
         //Check INTERNET permission
         checkInternetPermission();
 
-        android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, new ListBooks());
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment fragment = new ListBooks();
+        //Setting arguments
+        Bundle arguments = new Bundle();
+        arguments.putString("username", username);
+        fragment.setArguments(arguments);
+        ft.replace(R.id.fragment_container, fragment);
         ft.addToBackStack(null);
         ft.commit();
     }
@@ -143,13 +147,18 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container, new ListBooks());
+        if (id == R.id.nav_list) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            Fragment fragment = new ListBooks();
+            //Setting arguments
+            Bundle arguments = new Bundle();
+            arguments.putString("username", username);
+            fragment.setArguments(arguments);
+            ft.replace(R.id.fragment_container, fragment);
             ft.addToBackStack(null);
             ft.commit();
-        } else if (id == R.id.nav_gallery) {
-            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        } else if (id == R.id.nav_publish) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             Fragment fragment = new PublishBook();
             //Setting arguments
             Bundle arguments = new Bundle();
@@ -158,10 +167,8 @@ public class MainActivity extends AppCompatActivity
             ft.replace(R.id.fragment_container, fragment);
             ft.addToBackStack(null);
             ft.commit();
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_messages) {
+            Toast.makeText(this,"TODO MESSAGES",Toast.LENGTH_SHORT).show();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

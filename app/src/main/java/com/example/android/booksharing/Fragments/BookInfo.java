@@ -2,6 +2,8 @@ package com.example.android.booksharing.Fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,17 +25,21 @@ import org.w3c.dom.Text;
 public class BookInfo extends Fragment {
 
     private Publication publication;
+    private String usernameLog;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //Getting arguments
         if(getArguments() != null){
             String tmpPublication = getArguments().getString("publication");
+            usernameLog = getArguments().getString("username");
+            Log.i("USERNAME",usernameLog);
             try {
                 JSONObject json = new JSONObject(tmpPublication);
                 publication = new Publication(json.getString("username"),json.getString("title"),
                         json.getString("author"),json.getString("description"),
                         Float.valueOf(json.getString("rate")),json.getString("type"));
+                Log.i("PUBLICATION U",publication.getUsername());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -67,12 +73,26 @@ public class BookInfo extends Fragment {
         TextView description = (TextView) view.findViewById(R.id.descriptionView);
         description.setText(publication.getDescription());
 
-        Button button = (Button) view.findViewById(R.id.chatButton);
+        Button button = (Button) view.findViewById(R.id.messageButton);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 //Start chat Fragment
-                Toast.makeText(v.getContext(),"CHAT #TODO",Toast.LENGTH_SHORT).show();
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                Fragment fragment = new Messages();
+                //Setting arguments
+                Bundle arguments = new Bundle();
+                arguments.putString("sender",usernameLog);
+                arguments.putString("receiver", publication.getUsername());
+                fragment.setArguments(arguments);
+                //Starting fragment transaction
+                ft.replace(R.id.fragment_container, fragment);
+                ft.addToBackStack(null);
+                ft.commit();
             }
         });
+        if(usernameLog.equals(publication.getUsername())){
+            button.setVisibility(View.INVISIBLE);
+        }
+
     }
 }

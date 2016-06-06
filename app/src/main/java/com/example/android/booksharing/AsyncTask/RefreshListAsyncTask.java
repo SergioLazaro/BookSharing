@@ -91,11 +91,8 @@ public class RefreshListAsyncTask extends AsyncTask<String,Void,String> {
                 din.put("Book",p.getTitle() + " - " + p.getAuthor());
                 infoToShow.add(din);
             }
-            //Modify the adapter to show publications dynamically
-            SimpleAdapter arrayAdapter = new SimpleAdapter(context, infoToShow, android.R.layout.two_line_list_item ,
-                    new String[] { "Book","User" },
-                    new int[] {android.R.id.text1, android.R.id.text2});
-            ListBooks.setAdapter(arrayAdapter, array);
+
+            ListBooks.setAdapter(infoToShow, array);
 
         } catch (JSONException e) {
             e.printStackTrace();

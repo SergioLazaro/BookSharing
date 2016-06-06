@@ -1,6 +1,7 @@
 package com.example.android.booksharing.Fragments;
 
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import com.example.android.booksharing.Objects.Publication;
 import com.example.android.booksharing.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Sergio on 1/6/16.
@@ -27,12 +29,18 @@ public class ListBooks extends Fragment {
     private String selectedOption = "";
     private Spinner spinner;
     private static ListView list;
-    private static ArrayList<Publication> array;
+    public static ArrayList<Publication> array;
     private static SimpleAdapter arrayAdapter;
+    private static View view;
+    private String username;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        if(getArguments() != null) {
+            username = getArguments().getString("username");
+        }
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.list_books_fragment, container, false);
     }
@@ -40,6 +48,8 @@ public class ListBooks extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        this.view = view;
+        array = new ArrayList<Publication>();
         spinner = (Spinner) view.findViewById(R.id.spinner);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -60,11 +70,12 @@ public class ListBooks extends Fragment {
             public void onItemClick(AdapterView adapterView, View view, int position, long id) {
                 Publication p = array.get(position);    //Getting clicked element
                 //Prepare new Fragment
-                android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
                 Fragment fragment = new BookInfo();
                 //Setting arguments
                 Bundle arguments = new Bundle();
                 arguments.putString("publication", p.generateJSONObject());
+                arguments.putString("username",username);
                 fragment.setArguments(arguments);
                 //Starting fragment transaction
                 ft.replace(R.id.fragment_container, fragment);
@@ -74,10 +85,12 @@ public class ListBooks extends Fragment {
         });
     }
 
-    public static void setAdapter(SimpleAdapter newAdapter, ArrayList<Publication> newArray){
-        Log.i("CHANGING ADAPTER","CHANGING ADAPTER");
+    public static void setAdapter(ArrayList<HashMap<String,String>> infoToShow, ArrayList<Publication> newArray){
+        Log.i("CHANGING ADAPTER", "CHANGING ADAPTER");
         array = newArray;
-        arrayAdapter = newAdapter;
+        arrayAdapter = new SimpleAdapter(view.getContext(), infoToShow, android.R.layout.two_line_list_item ,
+                new String[] { "Book","User" },
+                new int[] {android.R.id.text1, android.R.id.text2});
         list.setAdapter(arrayAdapter);
     }
 }
