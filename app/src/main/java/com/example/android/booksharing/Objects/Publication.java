@@ -10,10 +10,24 @@ import org.json.JSONObject;
  */
 public class Publication {
 
+    private int publicationID;
     private String username, title, author, type, description;
     private float rate;
 
-    public Publication(String username, String title, String author, String type, float rate, String description){
+    public Publication(String username, String title, String author, String type,
+                       float rate, String description){
+        this.publicationID = -1;
+        this.username = username;
+        this.title = title;
+        this.author = author;
+        this.type = type;
+        this.rate = rate;
+        this.description = description;
+    }
+
+    public Publication(int publicationID, String username, String title, String author, String type,
+                       float rate, String description){
+        this.publicationID = publicationID;
         this.username = username;
         this.title = title;
         this.author = author;
@@ -70,9 +84,22 @@ public class Publication {
         this.rate = rate;
     }
 
+    public int getPublicationID() {
+        return publicationID;
+    }
+
+    public void setPublicationID(int publicationID) {
+        this.publicationID = publicationID;
+    }
+
+    public void setRate(float rate) {
+        this.rate = rate;
+    }
+
     public String generateJSONObject(){
         JSONObject obj = new JSONObject();
         try {
+            obj.put("publicationID",publicationID);
             obj.put("username", username);
             obj.put("title", title);
             obj.put("author", author);

@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.example.android.booksharing.Activities.MainActivity;
 import com.example.android.booksharing.Fragments.ListBooks;
+import com.example.android.booksharing.Fragments.MessagesList;
+import com.example.android.booksharing.Objects.Message;
 import com.example.android.booksharing.Objects.Publication;
+import com.example.android.booksharing.Objects.UserComment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,14 +27,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by Sergio on 4/6/16.
+ * Created by Sergio on 6/6/16.
  */
-public class RefreshListAsyncTask extends AsyncTask<String,Void,String> {
-
+public class MessagesListAsyncTask extends AsyncTask<String,Void,String> {
     private Context context;
-    private String type;
-
-    public RefreshListAsyncTask(Context context) {
+    private String username;
+    public MessagesListAsyncTask(Context context) {
         this.context = context;
     }
 
@@ -42,10 +42,11 @@ public class RefreshListAsyncTask extends AsyncTask<String,Void,String> {
 
     protected String doInBackground(String... arg0) {
 
-        type = (String) arg0[0];
+        username = (String) arg0[0];
+
         try {
-            String link = "https://booksharing-sergiolazaro.rhcloud.com/list.php";
-            String data  = URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode(type, "UTF-8");
+            String link = "https://booksharing-sergiolazaro.rhcloud.com/loadConversations.php";
+            String data  = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
 
             URL url = new URL(link);
             URLConnection conn = url.openConnection();
@@ -76,38 +77,30 @@ public class RefreshListAsyncTask extends AsyncTask<String,Void,String> {
 
     protected void onPostExecute(String line){
         try {
-            Log.i("RESULT:",line);
             JSONObject json = new JSONObject(line);
-            JSONArray jsonArray = json.getJSONArray("posts");   //Getting JSON array
-            ArrayList<Publication> array = new ArrayList<Publication>();
-            ArrayList<HashMap<String,String>> infoToShow = new ArrayList<HashMap<String,String>>();
+            JSONArray jsonArray = json.getJSONArray("messages");   //Getting JSON array
+            ArrayList<Message> array = new ArrayList<Message>();
             for(int i = 0; i < jsonArray.length(); i++){
                 JSONObject elem = jsonArray.getJSONObject(i);
-                Publication p = generatePublication(elem);
-                array.add(p);
-                //Populating info to show
-                HashMap<String, String> din = new HashMap<String, String>(2);
-                din.put("User","User: " + p.getUsername());
-                din.put("Book",p.getTitle() + " - " + p.getAuthor());
-                infoToShow.add(din);
+                Message m = generateMessageObject(elem);
+                array.add(m);
             }
 
-            ListBooks.setAdapter(infoToShow, array);
-
+            MessagesList.setMessageArray(array);
+            
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private Publication generatePublication(JSONObject elem){
+    private Message generateMessageObject(JSONObject elem){
         try {
-            return new Publication(elem.getInt("publicationID"),elem.getString("username"),
-                    elem.getString("title"), elem.getString("author"),elem.getString("type"),
-                    Float.valueOf(elem.getString("rate")), elem.getString("description"));
+            return new Message(elem.getInt("id"),elem.getString("sender"),
+                    elem.getString("receiver"), elem.getString("message"),elem.getString("date"),
+                    elem.getInt("read"),elem.getInt("publicationID"));
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
         }
-
     }
 }

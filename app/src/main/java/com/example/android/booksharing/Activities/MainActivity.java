@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.android.booksharing.Fragments.ListBooks;
+import com.example.android.booksharing.Fragments.MessagesList;
 import com.example.android.booksharing.Fragments.PublishBook;
 import com.example.android.booksharing.R;
 
@@ -168,7 +169,15 @@ public class MainActivity extends AppCompatActivity
             ft.addToBackStack(null);
             ft.commit();
         } else if (id == R.id.nav_messages) {
-            Toast.makeText(this,"TODO MESSAGES",Toast.LENGTH_SHORT).show();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            Fragment fragment = new MessagesList();
+            //Setting arguments
+            Bundle arguments = new Bundle();
+            arguments.putString("username", username);
+            fragment.setArguments(arguments);
+            ft.replace(R.id.fragment_container, fragment);
+            ft.addToBackStack(null);
+            ft.commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

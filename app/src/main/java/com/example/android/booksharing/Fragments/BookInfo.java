@@ -33,13 +33,11 @@ public class BookInfo extends Fragment {
         if(getArguments() != null){
             String tmpPublication = getArguments().getString("publication");
             usernameLog = getArguments().getString("username");
-            Log.i("USERNAME",usernameLog);
             try {
                 JSONObject json = new JSONObject(tmpPublication);
-                publication = new Publication(json.getString("username"),json.getString("title"),
-                        json.getString("author"),json.getString("description"),
+                publication = new Publication(json.getInt("publicationID"),json.getString("username"),
+                        json.getString("title"), json.getString("author"),json.getString("description"),
                         Float.valueOf(json.getString("rate")),json.getString("type"));
-                Log.i("PUBLICATION U",publication.getUsername());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -83,6 +81,8 @@ public class BookInfo extends Fragment {
                 Bundle arguments = new Bundle();
                 arguments.putString("sender",usernameLog);
                 arguments.putString("receiver", publication.getUsername());
+                arguments.putInt("publicationID", publication.getPublicationID());
+                arguments.putString("title",publication.getTitle());
                 fragment.setArguments(arguments);
                 //Starting fragment transaction
                 ft.replace(R.id.fragment_container, fragment);
@@ -93,6 +93,5 @@ public class BookInfo extends Fragment {
         if(usernameLog.equals(publication.getUsername())){
             button.setVisibility(View.INVISIBLE);
         }
-
     }
 }

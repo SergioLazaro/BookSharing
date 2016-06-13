@@ -12,12 +12,6 @@ import java.security.NoSuchAlgorithmException;
  */
 public class User {
 
-    // The higher the number of iterations the more
-    // expensive computing the hash is for us and
-    // also for an attacker.
-    private static final int iterations = 65536;
-    private static final int saltLen = 32;
-    private static final int desiredKeyLen = 512;
 
     private String username, password, hash;
 

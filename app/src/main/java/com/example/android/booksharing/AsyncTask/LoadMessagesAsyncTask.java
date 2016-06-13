@@ -4,11 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.example.android.booksharing.Activities.MainActivity;
 import com.example.android.booksharing.Fragments.ListBooks;
+import com.example.android.booksharing.Fragments.Messages;
+import com.example.android.booksharing.Objects.Message;
 import com.example.android.booksharing.Objects.Publication;
 
 import org.json.JSONArray;
@@ -25,14 +26,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by Sergio on 4/6/16.
+ * Created by Sergio on 6/6/16.
  */
-public class RefreshListAsyncTask extends AsyncTask<String,Void,String> {
-
+public class LoadMessagesAsyncTask extends AsyncTask<String,Void,String> {
     private Context context;
-    private String type;
+    private String sender, receiver, publicationID;
 
-    public RefreshListAsyncTask(Context context) {
+    public LoadMessagesAsyncTask(Context context) {
         this.context = context;
     }
 
@@ -41,11 +41,15 @@ public class RefreshListAsyncTask extends AsyncTask<String,Void,String> {
     }
 
     protected String doInBackground(String... arg0) {
+        sender = (String) arg0[0];
+        receiver = (String) arg0[1];
+        publicationID = (String) arg0[2];
 
-        type = (String) arg0[0];
         try {
-            String link = "https://booksharing-sergiolazaro.rhcloud.com/list.php";
-            String data  = URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode(type, "UTF-8");
+            String link = "https://booksharing-sergiolazaro.rhcloud.com/loadMessages.php";
+            String data  = URLEncoder.encode("sender", "UTF-8") + "=" + URLEncoder.encode(sender, "UTF-8");
+            data += "&" + URLEncoder.encode("receiver", "UTF-8") + "=" + URLEncoder.encode(receiver, "UTF-8");
+            data += "&" + URLEncoder.encode("publicationID", "UTF-8") + "=" + URLEncoder.encode(publicationID, "UTF-8");
 
             URL url = new URL(link);
             URLConnection conn = url.openConnection();
@@ -76,34 +80,38 @@ public class RefreshListAsyncTask extends AsyncTask<String,Void,String> {
 
     protected void onPostExecute(String line){
         try {
-            Log.i("RESULT:",line);
             JSONObject json = new JSONObject(line);
-            JSONArray jsonArray = json.getJSONArray("posts");   //Getting JSON array
-            ArrayList<Publication> array = new ArrayList<Publication>();
+            JSONArray jsonArray = json.getJSONArray("messages");   //Getting JSON array
+            ArrayList<Message> array = new ArrayList<Message>();
             ArrayList<HashMap<String,String>> infoToShow = new ArrayList<HashMap<String,String>>();
             for(int i = 0; i < jsonArray.length(); i++){
                 JSONObject elem = jsonArray.getJSONObject(i);
-                Publication p = generatePublication(elem);
-                array.add(p);
+                Message m = generateMessage(elem);
+                array.add(m);
                 //Populating info to show
                 HashMap<String, String> din = new HashMap<String, String>(2);
-                din.put("User","User: " + p.getUsername());
-                din.put("Book",p.getTitle() + " - " + p.getAuthor());
+                if(m.getSender().equals(sender)){
+                    din.put("Message","You: " + m.getText());
+                }
+                else{
+                    din.put("Message",m.getSender() + ": " + m.getText());
+                }
+                din.put("Info", m.getDate());
                 infoToShow.add(din);
             }
 
-            ListBooks.setAdapter(infoToShow, array);
+            Messages.setAdapter(infoToShow, array);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private Publication generatePublication(JSONObject elem){
+    private Message generateMessage(JSONObject elem){
         try {
-            return new Publication(elem.getInt("publicationID"),elem.getString("username"),
-                    elem.getString("title"), elem.getString("author"),elem.getString("type"),
-                    Float.valueOf(elem.getString("rate")), elem.getString("description"));
+            return new Message(elem.getInt("id"),elem.getString("sender"),
+                    elem.getString("receiver"),elem.getString("message"),elem.getString("date"),
+                    elem.getInt("read"), elem.getInt("publicationID"));
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
