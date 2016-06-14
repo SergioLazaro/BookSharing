@@ -81,8 +81,8 @@ public class BookInfo extends Fragment {
                 Bundle arguments = new Bundle();
                 arguments.putString("sender",usernameLog);
                 arguments.putString("receiver", publication.getUsername());
-                arguments.putInt("publicationID", publication.getPublicationID());
                 arguments.putString("title",publication.getTitle());
+                arguments.putInt("publicationID", publication.getPublicationID());
                 fragment.setArguments(arguments);
                 //Starting fragment transaction
                 ft.replace(R.id.fragment_container, fragment);

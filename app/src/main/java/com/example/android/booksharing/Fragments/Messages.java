@@ -45,8 +45,8 @@ public class Messages extends Fragment {
         if(getArguments() != null){
             sender = getArguments().getString("sender");
             receiver = getArguments().getString("receiver");
-            publicationID = getArguments().getInt("publicationID");
             title = getArguments().getString("title");
+            publicationID = getArguments().getInt("publicationID");
         }
 
         // Inflate the layout for this fragment
@@ -76,8 +76,9 @@ public class Messages extends Fragment {
                 String message = messageLabel.getText().toString();
                 if (!message.equals("")) {
                     if (sql.checkSQLInjection(message)) { //EVERYTHING OK
+                        String pID = publicationID + "";
                         new SendMessageAsyncTask(v.getContext()).execute(sender, receiver, message,
-                                String.valueOf(publicationID));
+                                pID);
                         messageLabel.setText("");
                     } else {   //SQL INJECTION
                         Toast.makeText(v.getContext(), "Invalid message",
@@ -91,6 +92,7 @@ public class Messages extends Fragment {
         });
         //DELETE!!!
         new LoadMessagesAsyncTask(view.getContext()).execute(sender,receiver,String.valueOf(publicationID));
+
     }
 
     public static void setAdapter(ArrayList<HashMap<String,String>> infoToShow, ArrayList<Message> newArray){

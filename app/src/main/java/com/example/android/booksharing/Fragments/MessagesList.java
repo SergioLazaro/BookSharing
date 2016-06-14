@@ -148,6 +148,7 @@ public class MessagesList extends Fragment {
     }
 
     public static void setMessageArray(ArrayList<Message> _messageArray){
+        Log.e("ASDF","LENGTH: " + _messageArray.size());
         messageArray = _messageArray;
         setInfoToShow();
     }
