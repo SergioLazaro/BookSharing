@@ -101,10 +101,16 @@ public class LoadMessagesAsyncTask extends AsyncTask<String,Void,String> {
             }
 
             Messages.setAdapter(infoToShow, array);
+            //Log.e("ASYNC TASK SLEEPING","ASYNC TASK SLEEPING");
+            //Thread.sleep(6000);
+            //Log.e("LAUNCH NEW ASYNC","LAUNCH NEW ASYNC");
+            //new LoadMessagesAsyncTask(context).execute(sender, receiver, String.valueOf(publicationID));
 
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        } /**catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
     }
 
     private Message generateMessage(JSONObject elem){

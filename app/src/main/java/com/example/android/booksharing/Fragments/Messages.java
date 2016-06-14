@@ -27,6 +27,7 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
 
 /**
  * Created by Sergio on 6/6/16.
@@ -90,9 +91,7 @@ public class Messages extends Fragment {
                 }
             }
         });
-        //DELETE!!!
         new LoadMessagesAsyncTask(view.getContext()).execute(sender,receiver,String.valueOf(publicationID));
-
     }
 
     public static void setAdapter(ArrayList<HashMap<String,String>> infoToShow, ArrayList<Message> newArray){

@@ -113,9 +113,9 @@ public class MessagesList extends Fragment {
         ArrayList<HashMap<String,String>> infoToShow = new ArrayList<HashMap<String,String>>();
         int count = 0;
         int unread = 0;
+        displayedMessages.clear();
         for(Message m : messageArray){
             if(m.getPublicationID() == idsArray.get(selectedOption)){
-                displayedMessages.clear();
                 displayedMessages.add(m);
                 count++;
                 //Populating info to show
@@ -148,6 +148,9 @@ public class MessagesList extends Fragment {
     }
 
     public static void setMessageArray(ArrayList<Message> _messageArray){
+        for(Message m : _messageArray){
+            Log.e("ELEM",m.toString());
+        }
         Log.e("ASDF","LENGTH: " + _messageArray.size());
         messageArray = _messageArray;
         setInfoToShow();

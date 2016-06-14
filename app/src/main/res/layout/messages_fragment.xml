@@ -40,10 +40,10 @@
 
         <EditText
             android:layout_width="200dp"
-            android:layout_height="match_parent"
+            android:layout_height="56dp"
             android:id="@+id/message"
-            android:layout_weight="1"
-            android:hint="Type your message"/>
+            android:hint="Type your message"
+            android:layout_weight="0.29" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
