@@ -31,9 +31,11 @@ import java.util.HashMap;
 public class LoadMessagesAsyncTask extends AsyncTask<String,Void,String> {
     private Context context;
     private String sender, receiver, publicationID;
+    private Messages.messageCallBack fragmentCallback;
 
-    public LoadMessagesAsyncTask(Context context) {
+    public LoadMessagesAsyncTask(Context context, Messages.messageCallBack fragmentCallback) {
         this.context = context;
+        this.fragmentCallback = fragmentCallback;
     }
 
     protected void onPreExecute() {
@@ -82,46 +84,12 @@ public class LoadMessagesAsyncTask extends AsyncTask<String,Void,String> {
         try {
             JSONObject json = new JSONObject(line);
             JSONArray jsonArray = json.getJSONArray("messages");   //Getting JSON array
-            ArrayList<Message> array = new ArrayList<Message>();
-            ArrayList<HashMap<String,String>> infoToShow = new ArrayList<HashMap<String,String>>();
-            for(int i = 0; i < jsonArray.length(); i++){
-                JSONObject elem = jsonArray.getJSONObject(i);
-                Message m = generateMessage(elem);
-                array.add(m);
-                //Populating info to show
-                HashMap<String, String> din = new HashMap<String, String>(2);
-                if(m.getSender().equals(sender)){
-                    din.put("Message","You: " + m.getText());
-                }
-                else{
-                    din.put("Message",m.getSender() + ": " + m.getText());
-                }
-                din.put("Info", m.getDate());
-                infoToShow.add(din);
-            }
-
-            Messages.setAdapter(infoToShow, array);
-            //Log.e("ASYNC TASK SLEEPING","ASYNC TASK SLEEPING");
-            //Thread.sleep(6000);
-            //Log.e("LAUNCH NEW ASYNC","LAUNCH NEW ASYNC");
-            //new LoadMessagesAsyncTask(context).execute(sender, receiver, String.valueOf(publicationID));
+            fragmentCallback.onTaskDone(jsonArray.toString());
 
         } catch (JSONException e) {
             e.printStackTrace();
-        } /**catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-    }
-
-    private Message generateMessage(JSONObject elem){
-        try {
-            return new Message(elem.getInt("id"),elem.getString("sender"),
-                    elem.getString("receiver"),elem.getString("message"),elem.getString("date"),
-                    elem.getInt("read"), elem.getInt("publicationID"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
         }
-
     }
+
+
 }

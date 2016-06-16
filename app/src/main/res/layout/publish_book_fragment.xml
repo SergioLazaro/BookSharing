@@ -105,7 +105,6 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:background="@color/colorPrimary"
-        android:textColor="@color/textColor"
-        android:onClick="publish"/>
+        android:textColor="@color/textColor"/>
 
 </LinearLayout>

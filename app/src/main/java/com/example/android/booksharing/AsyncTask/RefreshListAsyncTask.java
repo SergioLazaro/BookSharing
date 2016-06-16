@@ -30,10 +30,13 @@ import java.util.HashMap;
 public class RefreshListAsyncTask extends AsyncTask<String,Void,String> {
 
     private Context context;
-    private String type;
+    private String type, caller, username;
+    ListBooks.refreshCallBack refreshCallBack;
 
-    public RefreshListAsyncTask(Context context) {
+    public RefreshListAsyncTask(Context context, ListBooks.refreshCallBack refreshCallBack) {
         this.context = context;
+        this.refreshCallBack = refreshCallBack;
+
     }
 
     protected void onPreExecute() {
@@ -43,9 +46,21 @@ public class RefreshListAsyncTask extends AsyncTask<String,Void,String> {
     protected String doInBackground(String... arg0) {
 
         type = (String) arg0[0];
+        caller = (String) arg0[1];
+
         try {
-            String link = "https://booksharing-sergiolazaro.rhcloud.com/list.php";
-            String data  = URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode(type, "UTF-8");
+            String link = "";
+            String data = "";
+            if(caller.equals("main")){
+                link = "https://booksharing-sergiolazaro.rhcloud.com/list.php";
+                data  = URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode(type, "UTF-8");
+            }
+            else{
+                username = (String) arg0[2];
+                link = "https://booksharing-sergiolazaro.rhcloud.com/getPublishedBooks.php";
+                data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
+                data += "&" + URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode(type, "UTF-8");
+            }
 
             URL url = new URL(link);
             URLConnection conn = url.openConnection();
@@ -76,38 +91,12 @@ public class RefreshListAsyncTask extends AsyncTask<String,Void,String> {
 
     protected void onPostExecute(String line){
         try {
-            Log.i("RESULT:",line);
             JSONObject json = new JSONObject(line);
             JSONArray jsonArray = json.getJSONArray("posts");   //Getting JSON array
-            ArrayList<Publication> array = new ArrayList<Publication>();
-            ArrayList<HashMap<String,String>> infoToShow = new ArrayList<HashMap<String,String>>();
-            for(int i = 0; i < jsonArray.length(); i++){
-                JSONObject elem = jsonArray.getJSONObject(i);
-                Publication p = generatePublication(elem);
-                array.add(p);
-                //Populating info to show
-                HashMap<String, String> din = new HashMap<String, String>(2);
-                din.put("User","User: " + p.getUsername());
-                din.put("Book",p.getTitle() + " - " + p.getAuthor());
-                infoToShow.add(din);
-            }
-
-            ListBooks.setAdapter(infoToShow, array);
+            refreshCallBack.onTaskDone(jsonArray.toString());
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    private Publication generatePublication(JSONObject elem){
-        try {
-            return new Publication(elem.getInt("publicationID"),elem.getString("username"),
-                    elem.getString("title"), elem.getString("author"),elem.getString("type"),
-                    Float.valueOf(elem.getString("rate")), elem.getString("description"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
-
     }
 }

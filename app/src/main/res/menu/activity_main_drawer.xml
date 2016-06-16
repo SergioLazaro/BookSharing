@@ -10,6 +10,10 @@
             android:id="@+id/nav_publish"
             android:icon="@drawable/publish"
             android:title="Publish" />
+        <item
+            android:id="@+id/nav_books"
+            android:icon="@drawable/ic_library_books_black_24dp"
+            android:title="Your books" />
     </group>
 
     <item android:title="Communicate">

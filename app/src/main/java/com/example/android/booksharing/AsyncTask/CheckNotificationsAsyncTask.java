@@ -2,11 +2,10 @@ package com.example.android.booksharing.AsyncTask;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
+import com.example.android.booksharing.Activities.MainActivity;
 import com.example.android.booksharing.Fragments.Messages;
-import com.example.android.booksharing.Fragments.MessagesList;
-import com.example.android.booksharing.Objects.Message;
-import com.example.android.booksharing.Objects.Publication;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,18 +17,18 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
- * Created by Sergio on 12/6/16.
+ * Created by Sergio on 16/6/16.
  */
-public class LoadUserPublicationsAsyncTask extends AsyncTask<String,Void,String> {
+public class CheckNotificationsAsyncTask extends AsyncTask<String,Void,String> {
     private Context context;
     private String username;
+    private MainActivity.CheckNotifications fragmentCallback;
 
-    public LoadUserPublicationsAsyncTask(Context context) {
+    public CheckNotificationsAsyncTask(Context context, MainActivity.CheckNotifications fragmentCallback) {
         this.context = context;
+        this.fragmentCallback = fragmentCallback;
     }
 
     protected void onPreExecute() {
@@ -40,8 +39,8 @@ public class LoadUserPublicationsAsyncTask extends AsyncTask<String,Void,String>
         username = (String) arg0[0];
 
         try {
-            String link = "https://booksharing-sergiolazaro.rhcloud.com/loadUserPublications.php";
-            String data  = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
+            String link = "https://booksharing-sergiolazaro.rhcloud.com/checkNotifications.php";
+            String data = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
 
             URL url = new URL(link);
             URLConnection conn = url.openConnection();
@@ -70,25 +69,13 @@ public class LoadUserPublicationsAsyncTask extends AsyncTask<String,Void,String>
     }
 
 
-    protected void onPostExecute(String line){
+    protected void onPostExecute(String line) {
         try {
             JSONObject json = new JSONObject(line);
-            JSONArray jsonArray = json.getJSONArray("publications");   //Getting JSON array
-            ArrayList<String> titlesArray = new ArrayList<String>();
-            ArrayList<Integer> idsArray = new ArrayList<Integer>();
-            for(int i = 0; i < jsonArray.length(); i++){
-                JSONObject elem = jsonArray.getJSONObject(i);
-                int publicationID = elem.getInt("publicationID");
-                String title = elem.getString("title");
-                titlesArray.add(title);
-                idsArray.add(publicationID);
-            }
-
-            MessagesList.setSpinner(titlesArray,idsArray);
-
+            boolean notifications = Boolean.valueOf(json.getString("notifications"));
+            fragmentCallback.onTaskDone(notifications);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
-
 }

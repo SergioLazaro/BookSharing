@@ -32,9 +32,11 @@ import java.util.HashMap;
 public class SendMessageAsyncTask extends AsyncTask<String,Void,String> {
     private Context context;
     private String sender, receiver, message, date, publicationID;
+    private Messages.sendMessageCallBack fragmentCallback;
 
-    public SendMessageAsyncTask(Context context) {
+    public SendMessageAsyncTask(Context context,  Messages.sendMessageCallBack fragmentCallback) {
         this.context = context;
+        this.fragmentCallback = fragmentCallback;
     }
 
     protected void onPreExecute() {
@@ -93,7 +95,7 @@ public class SendMessageAsyncTask extends AsyncTask<String,Void,String> {
             }
             else{
                 Toast.makeText(context, "Message sent to " + receiver, Toast.LENGTH_SHORT).show();
-                new LoadMessagesAsyncTask(context).execute(sender, receiver,publicationID);
+                fragmentCallback.onTaskDone();
             }
 
         } catch (JSONException e) {

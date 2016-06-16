@@ -14,9 +14,10 @@ public class SQLInjection {
      * @return true if [line] doesnt contains words like DROP, INSERT INTO, DELETE FROM OR UPDATE.
      */
     public boolean checkSQLInjection(String line){
-        if(!line.contains("DROP") || !line.contains("INSERT INTO") || !line.contains("DELETE FROM")
-                || !line.contains("UPDATE") || !line.contains("<") || !line.contains(">")
-                || !line.contains("OR")){
+        line = line.toUpperCase();
+        if(!line.contains("DROP") && !line.contains("INSERT INTO") && !line.contains("DELETE FROM")
+                && !line.contains("UPDATE") && !line.contains("<") && !line.contains(">")
+                && !line.contains("OR")){
             return true;
         }
         else{

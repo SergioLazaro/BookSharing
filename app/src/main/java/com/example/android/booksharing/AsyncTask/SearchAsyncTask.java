@@ -1,17 +1,20 @@
 package com.example.android.booksharing.AsyncTask;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.android.booksharing.Activities.MainActivity;
+import com.example.android.booksharing.Fragments.BookInfo;
 import com.example.android.booksharing.Fragments.ListBooks;
-import com.example.android.booksharing.Fragments.MessagesList;
-import com.example.android.booksharing.Objects.Message;
 import com.example.android.booksharing.Objects.Publication;
-import com.example.android.booksharing.Objects.UserComment;
+import com.example.android.booksharing.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,29 +30,33 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by Sergio on 6/6/16.
+ * Created by Sergio on 16/6/16.
  */
-public class MessagesListAsyncTask extends AsyncTask<String,Void,String> {
-    private Context context;
-    private String username;
-    private MessagesList.messageListCallBack fragmentCallback;
+public class SearchAsyncTask extends AsyncTask<String,Void,String> {
 
-    public MessagesListAsyncTask(Context context, MessagesList.messageListCallBack fragmentCallback) {
+    private Context context;
+    private String query, username;
+
+    private MainActivity.SearchCallBack mFragmentCallback;
+
+    public SearchAsyncTask(Context context, MainActivity.SearchCallBack fragmentCallback) {
         this.context = context;
-        this.fragmentCallback = fragmentCallback;
+        this.mFragmentCallback = fragmentCallback;
     }
 
     protected void onPreExecute() {
 
     }
 
+    @Override
     protected String doInBackground(String... arg0) {
 
-        username = (String) arg0[0];
+        query = (String)arg0[0];
+        username = (String) arg0[1];
 
         try {
-            String link = "https://booksharing-sergiolazaro.rhcloud.com/loadConversations.php";
-            String data  = URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
+            String link = "https://booksharing-sergiolazaro.rhcloud.com/search.php";
+            String data  = URLEncoder.encode("query", "UTF-8") + "=" + URLEncoder.encode(query, "UTF-8");
 
             URL url = new URL(link);
             URLConnection conn = url.openConnection();
@@ -78,16 +85,24 @@ public class MessagesListAsyncTask extends AsyncTask<String,Void,String> {
     }
 
 
+    @Override
     protected void onPostExecute(String line){
         try {
             JSONObject json = new JSONObject(line);
-            JSONArray jsonArray = json.getJSONArray("messages");   //Getting JSON array
-            fragmentCallback.onTaskDone(jsonArray.toString());
+            String type = json.getString("type");
+            JSONArray jsonArray = json.getJSONArray("result");   //Getting JSON array
+            if(jsonArray.length() > 0){
+                mFragmentCallback.onTaskDone(type,jsonArray.toString());
+            }
+            else{   //Empty results
+                Toast.makeText(context,"No results found",Toast.LENGTH_SHORT).show();
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
 
 
 }

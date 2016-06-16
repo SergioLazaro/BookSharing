@@ -6,7 +6,7 @@ package com.example.android.booksharing.Objects;
 public class Message {
 
     private int id, read, publicationID;
-    private String sender, receiver, text, date;
+    private String sender, receiver, text, date, title;
 
     public Message(int id, String sender, String receiver, String text, String date, int read,
                    int publicationID){
@@ -17,6 +17,25 @@ public class Message {
         this.date = date;
         this.read = read;
         this.publicationID = publicationID;
+        this.title = "";
+    }
+    public Message(int id, String sender, String receiver, int read, int publicationID, String title){
+        this.id = id;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.read = read;
+        this.publicationID = publicationID;
+        this.title = title;
+        this.date = "";
+        this.text = "";
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public int getPublicationID() {
@@ -80,10 +99,12 @@ public class Message {
         return "Message{" +
                 "id=" + id +
                 ", read=" + read +
+                ", publicationID=" + publicationID +
                 ", sender='" + sender + '\'' +
                 ", receiver='" + receiver + '\'' +
                 ", text='" + text + '\'' +
                 ", date='" + date + '\'' +
+                ", title='" + title + '\'' +
                 '}';
     }
 }

@@ -1,11 +1,13 @@
 package com.example.android.booksharing.Fragments;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -21,6 +23,7 @@ import com.example.android.booksharing.Objects.Publication;
 import com.example.android.booksharing.Objects.SQLInjection;
 import com.example.android.booksharing.R;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
@@ -36,9 +39,9 @@ public class Messages extends Fragment {
 
     private String sender, receiver, title;
     private int publicationID;
-    private static ListView list;
-    private static ArrayList<Message> array = new ArrayList<Message>();
-    private static View view;
+    private ListView list;
+    private ArrayList<Message> array = new ArrayList<Message>();
+    private View view;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -78,8 +81,13 @@ public class Messages extends Fragment {
                 if (!message.equals("")) {
                     if (sql.checkSQLInjection(message)) { //EVERYTHING OK
                         String pID = publicationID + "";
-                        new SendMessageAsyncTask(v.getContext()).execute(sender, receiver, message,
-                                pID);
+                        SendMessageAsyncTask messageAsyncTask = new SendMessageAsyncTask(v.getContext(),new sendMessageCallBack(){
+                            @Override
+                            public void onTaskDone() {
+                                launchLoadMessagesAsyncTask();
+                            }
+                        });
+                        messageAsyncTask.execute(sender, receiver, message, pID);
                         messageLabel.setText("");
                     } else {   //SQL INJECTION
                         Toast.makeText(v.getContext(), "Invalid message",
@@ -91,14 +99,73 @@ public class Messages extends Fragment {
                 }
             }
         });
-        new LoadMessagesAsyncTask(view.getContext()).execute(sender,receiver,String.valueOf(publicationID));
+
+        launchLoadMessagesAsyncTask();
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
     }
 
-    public static void setAdapter(ArrayList<HashMap<String,String>> infoToShow, ArrayList<Message> newArray){
-        array = newArray;
+    public interface messageCallBack {
+        public void onTaskDone(String json);
+    }
+
+    public interface sendMessageCallBack{
+        public void onTaskDone();
+    }
+
+    private void launchLoadMessagesAsyncTask(){
+        LoadMessagesAsyncTask asyncTask = new LoadMessagesAsyncTask(view.getContext(),new messageCallBack() {
+            @Override
+            public void onTaskDone(String json) {
+                populateArrays(json);
+            }
+
+        });
+        asyncTask.execute(sender,receiver,String.valueOf(publicationID));
+    }
+
+    private void setAdapter(ArrayList<HashMap<String,String>> infoToShow, ArrayList<Message> newArray){
         SimpleAdapter arrayAdapter = new SimpleAdapter(view.getContext(), infoToShow,
                 android.R.layout.two_line_list_item , new String[] { "Message","Info" },
                 new int[] {android.R.id.text1, android.R.id.text2});
         list.setAdapter(arrayAdapter);
+    }
+
+    private void populateArrays(String json){
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            array = new ArrayList<Message>();
+            ArrayList<HashMap<String, String>> infoToShow = new ArrayList<HashMap<String, String>>();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject elem = jsonArray.getJSONObject(i);
+                Message m = generateMessage(elem);
+                array.add(m);
+                //Populating info to show
+                HashMap<String, String> din = new HashMap<String, String>(2);
+                if (m.getSender().equals(sender)) {
+                    din.put("Message", "You: " + m.getText());
+                } else {
+                    din.put("Message", m.getSender() + ": " + m.getText());
+                }
+                din.put("Info", m.getDate());
+                infoToShow.add(din);
+            }
+            setAdapter(infoToShow,array);
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Message generateMessage(JSONObject elem){
+        try {
+            return new Message(elem.getInt("id"),elem.getString("sender"),
+                    elem.getString("receiver"),elem.getString("message"),elem.getString("date"),
+                    elem.getInt("read"), elem.getInt("publicationID"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 }

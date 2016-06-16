@@ -3,7 +3,7 @@ package com.example.android.booksharing.Fragments;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -72,13 +72,13 @@ public class PublishBook extends Fragment {
 
         confirmPublication.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                confirm();
+                confirm(v);
             }
         });
 
     }
 
-    private void confirm(){
+    private void confirm(View v){
         SQLInjection sql = new SQLInjection();
         String title = this.title.getText().toString();
         String author = this.author.getText().toString();
@@ -88,10 +88,10 @@ public class PublishBook extends Fragment {
             Log.e("USERNAME: ", username);
             Publication p = new Publication(username,title,author,selectedOption,
                     rating.getRating(),description);
-            new PublishAsyncTask(getContext()).execute(p.generateJSONObject());
+            new PublishAsyncTask(v.getContext()).execute(p.generateJSONObject());
         }
         else{
-            Toast.makeText(getContext(),"Invalid fields detected",Toast.LENGTH_SHORT).show();
+            Toast.makeText(v.getContext(),"Invalid fields detected",Toast.LENGTH_SHORT).show();
         }
     }
 
