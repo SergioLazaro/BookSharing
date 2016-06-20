@@ -30,6 +30,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -218,6 +220,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void callBackMethod(String json, String type){
+        hideKeyboard(this);
         if(type.equals("book")){
             JSONArray jsonArray;
             JSONObject jsonObject;
@@ -285,6 +288,7 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
         else if(id == R.id.notifications){
+            hideKeyboard(this);
             changeNotificationIconColor(false);
             launchMessagesListFragment();
             return true;
@@ -295,10 +299,13 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        //Hide the keyboard
+        hideKeyboard(this);
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_list) {
+
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             Fragment fragment = new ListBooks();
             //Setting arguments
@@ -332,20 +339,24 @@ public class MainActivity extends AppCompatActivity
             ft.commit();
         }
         else if (id == R.id.nav_messages) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            Fragment fragment = new MessagesList();
-            //Setting arguments
-            Bundle arguments = new Bundle();
-            arguments.putString("username", username);
-            fragment.setArguments(arguments);
-            ft.replace(R.id.fragment_container, fragment);
-            ft.addToBackStack(null);
-            ft.commit();
+            launchMessagesListFragment();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public static void hideKeyboard(Context ctx) {
+        InputMethodManager inputManager = (InputMethodManager) ctx
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        // check if no view has focus:
+        View v = ((Activity) ctx).getCurrentFocus();
+        if (v == null)
+            return;
+
+        inputManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 
 }

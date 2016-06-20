@@ -1,5 +1,6 @@
 package com.example.android.booksharing.AsyncTask;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -32,14 +33,17 @@ public class LoadMessagesAsyncTask extends AsyncTask<String,Void,String> {
     private Context context;
     private String sender, receiver, publicationID;
     private Messages.messageCallBack fragmentCallback;
+    private ProgressDialog dialog;
 
     public LoadMessagesAsyncTask(Context context, Messages.messageCallBack fragmentCallback) {
         this.context = context;
         this.fragmentCallback = fragmentCallback;
+        dialog = new ProgressDialog(context);
     }
 
     protected void onPreExecute() {
-
+        dialog.setMessage("Loading...");
+        dialog.show();
     }
 
     protected String doInBackground(String... arg0) {
@@ -82,6 +86,9 @@ public class LoadMessagesAsyncTask extends AsyncTask<String,Void,String> {
 
     protected void onPostExecute(String line){
         try {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
             JSONObject json = new JSONObject(line);
             JSONArray jsonArray = json.getJSONArray("messages");   //Getting JSON array
             fragmentCallback.onTaskDone(jsonArray.toString());

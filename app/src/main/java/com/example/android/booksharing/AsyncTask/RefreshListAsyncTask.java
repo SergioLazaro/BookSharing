@@ -1,5 +1,6 @@
 package com.example.android.booksharing.AsyncTask;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -23,6 +24,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
 
 /**
  * Created by Sergio on 4/6/16.
@@ -31,16 +33,19 @@ public class RefreshListAsyncTask extends AsyncTask<String,Void,String> {
 
     private Context context;
     private String type, caller, username;
-    ListBooks.refreshCallBack refreshCallBack;
+    private ListBooks.refreshCallBack refreshCallBack;
+    private ProgressDialog dialog;
 
     public RefreshListAsyncTask(Context context, ListBooks.refreshCallBack refreshCallBack) {
         this.context = context;
         this.refreshCallBack = refreshCallBack;
+        dialog = new ProgressDialog(context);
 
     }
 
     protected void onPreExecute() {
-
+        dialog.setMessage("Loading...");
+        dialog.show();
     }
 
     protected String doInBackground(String... arg0) {
@@ -91,6 +96,9 @@ public class RefreshListAsyncTask extends AsyncTask<String,Void,String> {
 
     protected void onPostExecute(String line){
         try {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
             JSONObject json = new JSONObject(line);
             JSONArray jsonArray = json.getJSONArray("posts");   //Getting JSON array
             refreshCallBack.onTaskDone(jsonArray.toString());

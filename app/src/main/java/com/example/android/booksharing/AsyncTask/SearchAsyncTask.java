@@ -2,6 +2,7 @@ package com.example.android.booksharing.AsyncTask;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,7 +37,6 @@ public class SearchAsyncTask extends AsyncTask<String,Void,String> {
 
     private Context context;
     private String query, username;
-
     private MainActivity.SearchCallBack mFragmentCallback;
 
     public SearchAsyncTask(Context context, MainActivity.SearchCallBack fragmentCallback) {
@@ -45,7 +45,6 @@ public class SearchAsyncTask extends AsyncTask<String,Void,String> {
     }
 
     protected void onPreExecute() {
-
     }
 
     @Override
